@@ -217,7 +217,7 @@ class SetupView: NSView {
 class OverlayView: NSView {
     static let SZ:CGFloat=700
     override var isFlipped:Bool{true}
-    let olR:CGFloat=90/255, olG:CGFloat=62/255, olB:CGFloat=62/255
+    let olR:CGFloat=90.0/255.0, olG:CGFloat=62.0/255.0, olB:CGFloat=62.0/255.0
 
     override func draw(_ dirtyRect:NSRect){
         guard let ctx=NSGraphicsContext.current?.cgContext else{return}
@@ -239,7 +239,7 @@ class OverlayView: NSView {
         let spd=sqrt(velx*velx+vely*vely)
         if spd>12&&(!p.isEx){dSpeed(g,dx,dy,velx,vely,spd)}
         if !p.isEx{dGlow(g,dx,dy)}
-        for i in 0..<p.trail.count-1{
+        for i in 0..<max(0,p.trail.count-1){
             let f=CGFloat(i+1)/CGFloat(p.trail.count)
             let a=Int(f*0.2*255); let gs=f*0.75*sc
             if gs>0.05{dPaw(g,p.trail[i].x+sx,p.trail[i].y+sy,gs,0,0,0,a)}}
@@ -481,7 +481,7 @@ func mouseCallback(proxy:CGEventTapProxy,type:CGEventType,event:CGEvent,
     case .otherMouseUp:
         btnUp(Int(event.getIntegerValueField(.mouseEventButtonNumber)))
     case .tapDisabledByTimeout:
-        if let tap=refcon{CGEvent.tapEnable(tap:OpaquePointer(tap),enable:true)}
+        if let t=App.shared?.eventTap{CGEvent.tapEnable(tap:t,enable:true)}
     default:break
     }
     return Unmanaged.passUnretained(event)
