@@ -1,0 +1,5 @@
+*.exe
+dist/
+*.tmp
+*.log
+*.mp3
