@@ -54,6 +54,7 @@ static Display *dpy;static Window root_win;
 static int xi_op;
 static volatile int purring=0;
 static int cursor_hidden=0;
+static volatile sig_atomic_t got_signal=0;
 
 /* WAV data */
 static unsigned char *wav_pcm=NULL;
@@ -112,9 +113,10 @@ static int parse_wav(unsigned char*d,size_t len){
         if(!memcmp(d+pos,"fmt ",4)&&pos+24<=len){
             wav_ch=r16(d+pos+10);wav_rate=r32(d+pos+12);wav_bits=r16(d+pos+22);}
         else if(!memcmp(d+pos,"data",4)){
-            wav_pcm=d+pos+8;wav_pcm_size=csz;
-            if(pos+8+csz>len)wav_pcm_size=(uint32_t)(len-pos-8);
-            return wav_ch>0&&wav_rate>0&&wav_bits>0;}
+            if(pos+8>len)return 0;
+            wav_pcm=d+pos+8;
+            wav_pcm_size=(pos+8+csz>len)?(uint32_t)(len-pos-8):csz;
+            return wav_ch>0&&wav_rate>0&&(wav_bits==8||wav_bits==16);}
         pos+=8+csz;if(csz%2)pos++;}
     return 0;
 }
@@ -136,11 +138,13 @@ static pthread_t snd_thread;
 static void*purr_fn(void*arg){
     (void)arg;
     snd_pcm_t*pcm;
-    if(snd_pcm_open(&pcm,"default",SND_PCM_STREAM_PLAYBACK,0)<0)return NULL;
+    if(snd_pcm_open(&pcm,"default",SND_PCM_STREAM_PLAYBACK,0)<0){purring=0;return NULL;}
     snd_pcm_format_t fmt=(wav_bits==16)?SND_PCM_FORMAT_S16_LE:SND_PCM_FORMAT_U8;
     if(snd_pcm_set_params(pcm,fmt,SND_PCM_ACCESS_RW_INTERLEAVED,wav_ch,wav_rate,1,100000)<0)
-        {snd_pcm_close(pcm);return NULL;}
-    int fsz=wav_ch*(wav_bits/8);int total=wav_pcm_size/fsz;
+        {snd_pcm_close(pcm);purring=0;return NULL;}
+    int fsz=wav_ch*(wav_bits/8);
+    if(fsz<=0){snd_pcm_close(pcm);purring=0;return NULL;}
+    int total=wav_pcm_size/fsz;
     while(purring){int off=0;
         while(purring&&off<total){
             int n=total-off;if(n>4096)n=4096;
@@ -150,9 +154,12 @@ static void*purr_fn(void*arg){
 }
 static void play_purr(void){
     if(purring||!wav_pcm)return;purring=1;
-    pthread_create(&snd_thread,NULL,purr_fn,NULL);}
+    if(pthread_create(&snd_thread,NULL,purr_fn,NULL)!=0)purring=0;
+    else snd_running=1;}
+static volatile int snd_running=0;
 static void stop_purr(void){
-    if(!purring)return;purring=0;pthread_join(snd_thread,NULL);}
+    if(!purring)return;purring=0;
+    if(snd_running){pthread_join(snd_thread,NULL);snd_running=0;}}
 
 /* ═══════════════════════════════════════════════════════════
  *  Cursor
@@ -165,7 +172,7 @@ static void show_cursor(void){
     XFixesShowCursor(dpy,root_win);XFlush(dpy);cursor_hidden=0;}
 
 static void cleanup(void){show_cursor();stop_purr();free(wav_file_buf);}
-static void sig_handler(int s){(void)s;show_cursor();_exit(0);}
+static void sig_handler(int s){(void)s;got_signal=1;}
 
 /* ═══════════════════════════════════════════════════════════
  *  Particles & Spawning
@@ -608,7 +615,7 @@ int main(void){
     cairo_surface_t*sf=cairo_xlib_surface_create(dpy,win,vis,SZ,SZ);
     cairo_t*cr=cairo_create(sf);
 
-    while(!done_){
+    while(!done_&&!got_signal){
         while(XPending(dpy)){XEvent ev;XNextEvent(dpy,&ev);
             if(ev.type==SelectionRequest){handle_sel_req(&ev);continue;}
             if(ev.type==GenericEvent&&ev.xcookie.extension==xi_op){

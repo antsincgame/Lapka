@@ -117,6 +117,7 @@ class OverlayForm : Form
     }
     void Render()
     {
+        IntPtr sdc=IntPtr.Zero,mdc=IntPtr.Zero,hb=IntPtr.Zero,old=IntPtr.Zero;
         try
         {
             Lapka.Tick();
@@ -126,15 +127,21 @@ class OverlayForm : Form
             gfx.ResetTransform(); gfx.TranslateTransform(-rx,-ry);
             Lapka.DrawAll(gfx);
             gfx.ResetTransform();
-            IntPtr sdc=Lapka.GetDC(IntPtr.Zero), mdc=Lapka.CDC(sdc);
-            IntPtr hb=bmp.GetHbitmap(Color.FromArgb(0)), old=Lapka.Sel(mdc,hb);
+            sdc=Lapka.GetDC(IntPtr.Zero); mdc=Lapka.CDC(sdc);
+            hb=bmp.GetHbitmap(Color.FromArgb(0)); old=Lapka.Sel(mdc,hb);
             var dp=new W32POINT{X=rx,Y=ry}; var sz=new W32SIZE{cx=SZ,cy=SZ};
             var sp=new W32POINT(); var bl=new BLEND{Alpha=255,Fmt=1};
             Lapka.ULW(Handle,sdc,ref dp,ref sz,mdc,ref sp,0,ref bl,2);
-            Lapka.Sel(mdc,old); Lapka.DelO(hb); Lapka.DelDC(mdc); Lapka.RelDC(IntPtr.Zero,sdc);
             if(Lapka.done){tmr.Stop();Close();}
         }
         catch { Lapka.RestCur(); throw; }
+        finally
+        {
+            if(old!=IntPtr.Zero&&mdc!=IntPtr.Zero) Lapka.Sel(mdc,old);
+            if(hb!=IntPtr.Zero) Lapka.DelO(hb);
+            if(mdc!=IntPtr.Zero) Lapka.DelDC(mdc);
+            if(sdc!=IntPtr.Zero) Lapka.RelDC(IntPtr.Zero,sdc);
+        }
     }
     protected override void Dispose(bool d)
     {
@@ -173,6 +180,7 @@ class Lapka
     [DllImport("kernel32.dll")] static extern IntPtr GlobalAlloc(uint f,UIntPtr sz);
     [DllImport("kernel32.dll")] static extern IntPtr GlobalLock(IntPtr h);
     [DllImport("kernel32.dll")] static extern bool GlobalUnlock(IntPtr h);
+    [DllImport("kernel32.dll")] static extern IntPtr GlobalFree(IntPtr h);
     [DllImport("user32.dll")] static extern void keybd_event(byte vk,byte scan,uint flags,UIntPtr extra);
 
     const int WH=14;
@@ -260,7 +268,9 @@ class Lapka
             EmptyClipboard();
             byte[] bytes=Encoding.Unicode.GetBytes(text+"\0");
             IntPtr hg=GlobalAlloc(0x0042,(UIntPtr)bytes.Length);
+            if(hg==IntPtr.Zero) return;
             IntPtr ptr=GlobalLock(hg);
+            if(ptr==IntPtr.Zero){GlobalFree(hg);return;}
             Marshal.Copy(bytes,0,ptr,bytes.Length);
             GlobalUnlock(hg);
             SetClipboardData(13,hg);
@@ -283,6 +293,7 @@ class Lapka
         hkP=HookCB;
         using(var pr=Process.GetCurrentProcess()) using(var mo=pr.MainModule)
             hkId=SetWindowsHookEx(WH,hkP,GetModuleHandle(mo.ModuleName),0);
+        if(hkId==IntPtr.Zero){MessageBox.Show("Failed to install mouse hook.","Lapka");return;}
         HideCur(); MkTray();
         try{ using(var o=new OverlayForm()) Application.Run(o); }
         finally{ RestCur(); UnhookWindowsHookEx(hkId); StopPurr();
@@ -355,7 +366,7 @@ class Lapka
                         SpawnRipple(ms.pt.X,ms.pt.Y);
                         Spawn(ms.pt.X,ms.pt.Y,isFP?20:5+rng.Next(5));
                         isFP=false; PlayPurr();
-                        TryInsertGratitude();
+                        System.Threading.ThreadPool.QueueUserWorkItem(_=>TryInsertGratitude());
                     }
                     else if(!dn){isP=false;isH=false;StopPurr();}
                 }

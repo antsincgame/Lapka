@@ -487,6 +487,8 @@ func mouseCallback(proxy:CGEventTapProxy,type:CGEventType,event:CGEvent,
     return Unmanaged.passUnretained(event)
 }
 
+let gratitudeQueue=DispatchQueue(label:"lapka.gratitude")
+
 func btnDown(_ b:Int,_ x:CGFloat,_ y:CGFloat){
     let p=Paw.i; guard b==p.aBtn&&(!p.isEx) else{return}
     p.isP=true; p.isH=true; p.hT=CACurrentMediaTime()
@@ -494,7 +496,7 @@ func btnDown(_ b:Int,_ x:CGFloat,_ y:CGFloat){
     p.spawnRipple(x,y)
     p.spawn(x,y,p.isFP ? 20:5+Int.random(in:0...4))
     p.isFP=false; App.shared?.playPurr()
-    DispatchQueue.global(qos:.userInitiated).async{tryInsertGratitude()}
+    gratitudeQueue.async{tryInsertGratitude()}
 }
 func btnUp(_ b:Int){
     let p=Paw.i; guard b==p.aBtn else{return}
@@ -562,7 +564,7 @@ class App: NSObject, NSApplicationDelegate {
 
     func startPaw(_ btn:Int){
         Paw.i.aBtn=btn; setupWin=nil
-        CGDisplayHideCursor(CGMainDisplayID())
+        for id in activeDisplayIDs(){CGDisplayHideCursor(id)}
 
         let sz=OverlayView.SZ
         let panel=NSPanel(contentRect:NSRect(x:0,y:0,width:sz,height:sz),
@@ -581,11 +583,14 @@ class App: NSObject, NSApplicationDelegate {
 
         timer=Timer.scheduledTimer(withTimeInterval:1.0/60.0,repeats:true){[weak self] _ in
             Paw.i.tick()
-            let sh=NSScreen.main?.frame.height ?? 900
-            let wx=Paw.i.px-sz/2, wy=sh-Paw.i.py-sz/2
+            let p=Paw.i
+            let pt=NSPoint(x:p.px,y:p.py)
+            let screen=NSScreen.screens.first(where:{NSMouseInRect(NSPoint(x:pt.x,y:$0.frame.maxY-pt.y),$0.frame,false)})?? NSScreen.main
+            let sh=screen?.frame.maxY ?? NSScreen.main?.frame.height ?? 900
+            let wx=p.px-sz/2, wy=sh-p.py-sz/2
             self?.overlayWin?.setFrameOrigin(NSPoint(x:wx,y:wy))
             self?.overlayView?.needsDisplay=true
-            if Paw.i.done{self?.quit()}
+            if p.done{self?.quit()}
         }
         RunLoop.current.add(timer!,forMode:.common)
     }
@@ -650,7 +655,7 @@ class App: NSObject, NSApplicationDelegate {
 
     func quit(){
         timer?.invalidate()
-        CGDisplayShowCursor(CGMainDisplayID())
+        for id in activeDisplayIDs(){CGDisplayShowCursor(id)}
         stopPurr()
         overlayWin?.close()
         statusItem=nil
@@ -658,7 +663,13 @@ class App: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_ n:Notification){
-        CGDisplayShowCursor(CGMainDisplayID())
+        for id in activeDisplayIDs(){CGDisplayShowCursor(id)}
+    }
+    func activeDisplayIDs()->[CGDirectDisplayID]{
+        var ids=[CGDirectDisplayID](repeating:0,count:16)
+        var cnt:UInt32=0
+        CGGetActiveDisplayList(16,&ids,&cnt)
+        return Array(ids.prefix(Int(cnt)))
     }
 }
 
@@ -671,7 +682,7 @@ app.setActivationPolicy(.accessory)
 let delegate=App(); App.shared=delegate
 app.delegate=delegate
 
-signal(SIGTERM){_ in CGDisplayShowCursor(CGMainDisplayID());exit(0)}
-signal(SIGINT){_ in CGDisplayShowCursor(CGMainDisplayID());exit(0)}
+signal(SIGTERM){_ in _exit(0)}
+signal(SIGINT){_ in _exit(0)}
 
 app.run()
