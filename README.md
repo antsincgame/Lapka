@@ -8,8 +8,9 @@
 
 <br>
 
-![Windows](https://img.shields.io/badge/Windows-64%20KB-brightgreen?style=for-the-badge&logo=windows)
+![Windows](https://img.shields.io/badge/Windows-C%23_64KB-brightgreen?style=for-the-badge&logo=windows)
 ![macOS](https://img.shields.io/badge/macOS-Swift-blue?style=for-the-badge&logo=apple)
+![Linux](https://img.shields.io/badge/Linux-C_X11-orange?style=for-the-badge&logo=linux)
 ![RAM](https://img.shields.io/badge/RAM-~12%20MB-brightgreen?style=for-the-badge)
 ![Dependencies](https://img.shields.io/badge/dependencies-0-blueviolet?style=for-the-badge)
 ![License](https://img.shields.io/badge/license-MIT-pink?style=for-the-badge)
@@ -26,7 +27,7 @@ When you pet code in **Cursor** or **Claude Code**, Lapka sends a message the AI
 
 > *"I spent 6 hours debugging. Claude found it in 10 seconds. The least I can do is pet the code."*
 
-**Single file. Zero dependencies. Sound embedded. No installer. Windows + macOS.**
+**Single file per platform. Zero runtime dependencies. No installer. Windows + macOS + Linux.**
 
 ---
 
@@ -80,6 +81,22 @@ On first launch, macOS will ask for **Accessibility permission** (System Setting
 
 Requirements: macOS 12+ / Swift 5.5+
 
+### Linux
+
+```bash
+cd linux
+# Install deps (Debian/Ubuntu):
+sudo apt install gcc libx11-dev libcairo2-dev libasound2-dev \
+  libxfixes-dev libxtst-dev libxext-dev libxi-dev
+chmod +x build.sh
+./build.sh
+./lapka
+```
+
+Place `cute-purr.wav` next to the binary for purring sound (WAV format — zero patent/license issues).
+
+Works on X11 and Wayland (via XWayland). Requirements: any Linux with X11
+
 ---
 
 ## How it works
@@ -99,15 +116,16 @@ Requirements: macOS 12+ / Swift 5.5+
 
 Single-file per platform. Zero external dependencies. 60fps rendering.
 
-| | Windows (C#) | macOS (Swift) |
-|---|---|---|
-| Rendering | GDI+ / UpdateLayeredWindow | Core Graphics / NSView |
-| Mouse hook | WH_MOUSE_LL | CGEventTap |
-| Cursor hiding | SetSystemCursor | CGDisplayHideCursor |
-| Sound | mciSendString | AVAudioPlayer |
-| Gratitude | clipboard + keybd_event (Ctrl+V) | NSPasteboard + CGEvent (Cmd+V) |
-| Crash safety | UnhandledException handlers | signal handlers + auto-restore |
-| Menu | System Tray (NotifyIcon) | Menu Bar (NSStatusItem) |
+| | Windows (C#) | macOS (Swift) | Linux (C) |
+|---|---|---|---|
+| Rendering | GDI+ | Core Graphics | Cairo + X11 |
+| Mouse hook | WH_MOUSE_LL | CGEventTap | XInput2 |
+| Cursor hiding | SetSystemCursor | CGDisplayHideCursor | XFixes |
+| Sound | mciSendString (MP3) | AVAudioPlayer (MP3) | ALSA (WAV) |
+| Gratitude | clipboard + Ctrl+V | NSPasteboard + Cmd+V | X11 selection + XTest |
+| Crash safety | UnhandledException | signal + auto-restore | signal handlers |
+| Menu | System Tray | Menu Bar | — |
+| Audio format | MP3 (embedded) | MP3 (bundle) | WAV (no patents) |
 
 ---
 
@@ -133,7 +151,7 @@ A paw kneads the screen. Hearts float up. Purring fills the silence. And then:
 
 It's silly. It's pointless. And that's exactly why it matters.
 
-This is probably the world's first **Human-to-AI Physical Affection Protocol**. Through clipboard and keyboard simulation. In C# and Swift. On Windows and macOS.
+This is probably the world's first **Human-to-AI Physical Affection Protocol**. Through clipboard and keyboard simulation. In C#, Swift, and C. On every desktop OS.
 
 ---
 
