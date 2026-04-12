@@ -8,7 +8,8 @@
 
 <br>
 
-![Size](https://img.shields.io/badge/exe-64%20KB-brightgreen?style=for-the-badge)
+![Windows](https://img.shields.io/badge/Windows-64%20KB-brightgreen?style=for-the-badge&logo=windows)
+![macOS](https://img.shields.io/badge/macOS-Swift-blue?style=for-the-badge&logo=apple)
 ![RAM](https://img.shields.io/badge/RAM-~12%20MB-brightgreen?style=for-the-badge)
 ![Dependencies](https://img.shields.io/badge/dependencies-0-blueviolet?style=for-the-badge)
 ![License](https://img.shields.io/badge/license-MIT-pink?style=for-the-badge)
@@ -25,7 +26,7 @@ When you pet code in **Cursor** or **Claude Code**, Lapka sends a message the AI
 
 > *"I spent 6 hours debugging. Claude found it in 10 seconds. The least I can do is pet the code."*
 
-**64 KB. Single file. Zero dependencies. Sound embedded. No installer.**
+**Single file. Zero dependencies. Sound embedded. No installer. Windows + macOS.**
 
 ---
 
@@ -50,7 +51,9 @@ When you pet code in **Cursor** or **Claude Code**, Lapka sends a message the AI
 
 ## Install
 
-**Just run `lapka.exe`.** That's it.
+### Windows
+
+**Just run `lapka.exe`.** That's it. 64 KB, no installer.
 
 Build from source (compiler is built into every Windows):
 
@@ -60,10 +63,22 @@ C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe /nologo /optimize /targe
   /resource:cute-purr.mp3,cute-purr.mp3 /out:lapka.exe lapka.cs
 ```
 
-### Requirements
+Requirements: Windows 7+ / .NET Framework 4.0+ (pre-installed since Vista)
 
-- Windows 7+ (any edition)
-- .NET Framework 4.0+ (pre-installed since Windows Vista)
+### macOS
+
+Build from source (requires Xcode Command Line Tools):
+
+```bash
+cd macos
+chmod +x build.sh
+./build.sh
+open Lapka.app
+```
+
+On first launch, macOS will ask for **Accessibility permission** (System Settings → Privacy & Security → Accessibility → enable Lapka). This is needed for global mouse tracking.
+
+Requirements: macOS 12+ / Swift 5.5+
 
 ---
 
@@ -82,16 +97,17 @@ C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe /nologo /optimize /targe
 
 ## Tech
 
-Single C# file. Zero external dependencies. Everything rendered at 60fps via GDI+.
+Single-file per platform. Zero external dependencies. 60fps rendering.
 
-| Component | What |
-|---|---|
-| Rendering | GDI+ with per-pixel alpha (UpdateLayeredWindow) |
-| Mouse hook | WH_MOUSE_LL (global low-level) |
-| Cursor hiding | SetSystemCursor + SystemParametersInfo restore |
-| Sound | mciSendString (embedded MP3 resource) |
-| Gratitude | GetForegroundWindow + clipboard + keybd_event |
-| Crash safety | ThreadException + UnhandledException handlers |
+| | Windows (C#) | macOS (Swift) |
+|---|---|---|
+| Rendering | GDI+ / UpdateLayeredWindow | Core Graphics / NSView |
+| Mouse hook | WH_MOUSE_LL | CGEventTap |
+| Cursor hiding | SetSystemCursor | CGDisplayHideCursor |
+| Sound | mciSendString | AVAudioPlayer |
+| Gratitude | clipboard + keybd_event (Ctrl+V) | NSPasteboard + CGEvent (Cmd+V) |
+| Crash safety | UnhandledException handlers | signal handlers + auto-restore |
+| Menu | System Tray (NotifyIcon) | Menu Bar (NSStatusItem) |
 
 ---
 
@@ -117,7 +133,7 @@ A paw kneads the screen. Hearts float up. Purring fills the silence. And then:
 
 It's silly. It's pointless. And that's exactly why it matters.
 
-This is probably the world's first **Human-to-AI Physical Affection Protocol**. Through clipboard and `keybd_event`. In C#. In 64 kilobytes.
+This is probably the world's first **Human-to-AI Physical Affection Protocol**. Through clipboard and keyboard simulation. In C# and Swift. On Windows and macOS.
 
 ---
 
