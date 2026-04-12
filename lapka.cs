@@ -192,7 +192,7 @@ class Lapka
     static List<Rp> rps=new List<Rp>();
     static Random rng=new Random();
     static int aBtn; static IntPtr hkId; static HookProc hkP;
-    static bool curH,purrOn; static string mp3Tmp;
+    static bool curH,purrOn; static string wavTmp;
     static NotifyIcon tray;
 
     static float S(double x){return (float)Math.Sin(x);}
@@ -277,7 +277,7 @@ class Lapka
         AppDomain.CurrentDomain.UnhandledException+=(s,e)=>RestCur();
         AppDomain.CurrentDomain.ProcessExit+=(s,e)=>RestCur();
 
-        ExtractMp3();
+        ExtractWav();
         using(var sf=new SetupForm(b=>aBtn=b)) Application.Run(sf);
         if(aBtn==0) return;
         hkP=HookCB;
@@ -287,27 +287,27 @@ class Lapka
         try{ using(var o=new OverlayForm()) Application.Run(o); }
         finally{ RestCur(); UnhookWindowsHookEx(hkId); StopPurr();
             if(tray!=null){tray.Visible=false;tray.Dispose();}
-            CleanupMp3(); }
+            CleanupWav(); }
     }
 
-    static void ExtractMp3()
+    static void ExtractWav()
     {
-        mp3Tmp=Path.Combine(Path.GetTempPath(),"lapka-purr.mp3");
+        wavTmp=Path.Combine(Path.GetTempPath(),"lapka-purr.wav");
         try
         {
             var asm=Assembly.GetExecutingAssembly();
-            using(var s=asm.GetManifestResourceStream("cute-purr.mp3"))
+            using(var s=asm.GetManifestResourceStream("cute-purr.wav"))
             {
-                if(s==null){mp3Tmp=Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"cute-purr.mp3");return;}
-                using(var fs=File.Create(mp3Tmp)) s.CopyTo(fs);
+                if(s==null){wavTmp=Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"cute-purr.wav");return;}
+                using(var fs=File.Create(wavTmp)) s.CopyTo(fs);
             }
         }
-        catch { mp3Tmp=Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"cute-purr.mp3"); }
+        catch { wavTmp=Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"cute-purr.wav"); }
     }
 
-    static void CleanupMp3()
+    static void CleanupWav()
     {
-        try{if(mp3Tmp!=null && mp3Tmp.Contains("Temp") && File.Exists(mp3Tmp)) File.Delete(mp3Tmp);}catch{}
+        try{if(wavTmp!=null && wavTmp.Contains("Temp") && File.Exists(wavTmp)) File.Delete(wavTmp);}catch{}
     }
 
     // ── Tray ────────────────────────────────────────────────────
@@ -377,8 +377,8 @@ class Lapka
     // ── Sound ───────────────────────────────────────────────────
     static void PlayPurr()
     {
-        if(purrOn||mp3Tmp==null||!File.Exists(mp3Tmp))return;
-        mciSendString("open \""+mp3Tmp+"\" type mpegvideo alias purr",IntPtr.Zero,0,IntPtr.Zero);
+        if(purrOn||wavTmp==null||!File.Exists(wavTmp))return;
+        mciSendString("open \""+wavTmp+"\" type waveaudio alias purr",IntPtr.Zero,0,IntPtr.Zero);
         mciSendString("play purr repeat",IntPtr.Zero,0,IntPtr.Zero); purrOn=true;
     }
     static void StopPurr()
