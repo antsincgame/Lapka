@@ -163,7 +163,7 @@ class Lapka
     [DllImport("user32.dll")] static extern bool SetSystemCursor(IntPtr c,uint id);
     [DllImport("user32.dll")] static extern bool SystemParametersInfo(uint a,uint b,IntPtr c,uint d);
     [DllImport("user32.dll")] static extern IntPtr CreateCursor(IntPtr h,int xH,int yH,int w,int h2,byte[] a,byte[] x);
-    [DllImport("winmm.dll",CharSet=CharSet.Unicode)] static extern int mciSendString(string c,IntPtr b,int s,IntPtr w);
+    [DllImport("winmm.dll",CharSet=CharSet.Unicode)] static extern bool PlaySound(string f,IntPtr m,uint flags);
     [DllImport("user32.dll")] static extern IntPtr GetForegroundWindow();
     [DllImport("user32.dll",CharSet=CharSet.Unicode)] static extern int GetWindowText(IntPtr h,StringBuilder b,int max);
     [DllImport("user32.dll")] static extern bool OpenClipboard(IntPtr h);
@@ -375,17 +375,16 @@ class Lapka
     public static void RestCur(){if(!curH)return;SystemParametersInfo(0x57,0,IntPtr.Zero,0);curH=false;}
 
     // ── Sound ───────────────────────────────────────────────────
+    const uint SND_ASYNC=0x0001,SND_LOOP=0x0008,SND_FILENAME=0x00020000,SND_PURGE=0x0040;
     static void PlayPurr()
     {
         if(purrOn||wavTmp==null||!File.Exists(wavTmp))return;
-        mciSendString("open \""+wavTmp+"\" type waveaudio alias purr",IntPtr.Zero,0,IntPtr.Zero);
-        mciSendString("play purr repeat",IntPtr.Zero,0,IntPtr.Zero); purrOn=true;
+        PlaySound(wavTmp,IntPtr.Zero,SND_FILENAME|SND_ASYNC|SND_LOOP); purrOn=true;
     }
     static void StopPurr()
     {
         if(!purrOn)return;
-        mciSendString("stop purr",IntPtr.Zero,0,IntPtr.Zero);
-        mciSendString("close purr",IntPtr.Zero,0,IntPtr.Zero); purrOn=false;
+        PlaySound(null,IntPtr.Zero,SND_PURGE); purrOn=false;
     }
 
     // ── Particles ───────────────────────────────────────────────
