@@ -104,7 +104,7 @@ final class Paw {
     func spawn(_ x:CGFloat,_ y:CGFloat,_ n:Int){
         for _ in 0..<n{
             let r=CGFloat.random(in:0...1); let ci=Int.random(in:0...4); let p:Pt
-            if r<0.04{p=Pt(2,x+.random(in:-20...20),y-20,.random(in:-0.75...1.25),
+            if r<0.04{p=Pt(2,x + .random(in:-20...20),y-20,.random(in:-0.75...1.25),
                 .random(in:0.3...1.8),Int.random(in:70...110),.random(in:5...11),255,183,197)}
             else if r<0.10{p=Pt(4,x,y-10,.random(in:-1.25...1.25),-.random(in:1.5...4.5),
                 Int.random(in:40...65),.random(in:16...22),Paw.sR[ci],Paw.sG[ci],Paw.sB[ci],Paw.no.randomElement())}
@@ -112,7 +112,7 @@ final class Paw {
                 Int.random(in:50...80),.random(in:13...18),Paw.hR[ci],Paw.hG[ci],Paw.hB[ci],Paw.tx.randomElement())}
             else if r<0.25{p=Pt(4,x,y-10,.random(in:-0.75...0.75),-.random(in:1...3),
                 Int.random(in:55...85),.random(in:11...14),Paw.hR[ci],Paw.hG[ci],Paw.hB[ci],Paw.ka.randomElement())}
-            else if r<0.30{p=Pt(3,x+.random(in:-15...15),y,.random(in:-0.4...0.4),
+            else if r<0.30{p=Pt(3,x + .random(in:-15...15),y,.random(in:-0.4...0.4),
                 -.random(in:0.8...2.8),Int.random(in:50...80),.random(in:4...12),200,220,255)}
             else if r<0.60{p=Pt(0,x,y-5,.random(in:-1.5...1.5),-.random(in:1.5...4.5),
                 Int.random(in:45...75),.random(in:6...16),Paw.hR[ci],Paw.hG[ci],Paw.hB[ci])}
@@ -123,7 +123,7 @@ final class Paw {
     }
     func spawnTS(_ x:CGFloat,_ y:CGFloat){
         let ci=Int.random(in:0...4)
-        pts.append(Pt(1,x+.random(in:-7...7),y+.random(in:-7...7),
+        pts.append(Pt(1,x + .random(in:-7...7),y + .random(in:-7...7),
             .random(in:-0.25...0.25),.random(in:-0.55...(-0.05)),
             Int.random(in:12...22),.random(in:1.5...4.5),Paw.sR[ci],Paw.sG[ci],Paw.sB[ci]))
         while pts.count>120{pts.removeFirst()}
@@ -263,7 +263,7 @@ class OverlayView: NSView {
     // ── Speed lines ──
     func dSpeed(_ g:CGContext,_ x:CGFloat,_ y:CGFloat,_ vx:CGFloat,_ vy:CGFloat,_ sp:CGFloat){
         let a=atan2(vy,vx); var in_=(sp-12)/30; if in_>1{in_=1}
-        g.saveGState(); g.translateBy(x:x,y:y); g.rotate(by:a+.pi)
+        g.saveGState(); g.translateBy(x:x,y:y); g.rotate(by:a + .pi)
         g.setStrokeColor(CGColor(red:1,green:180.0/255.0,blue:210.0/255.0,alpha:in_*65.0/255.0))
         g.setLineWidth(1.5); g.setLineCap(.round)
         for i in 0..<5{let s=CGFloat(i-2)*8; let l=15+in_*25
@@ -402,7 +402,7 @@ class OverlayView: NSView {
         let a=CGFloat(ai)/255
         g.saveGState(); g.translateBy(x:p.x,y:p.y); g.rotate(by:p.rot)
         let path=CGMutablePath()
-        for i in 0..<4{let an=CGFloat(i)*(.pi/2); let ia=an+.pi/4
+        for i in 0..<4{let an=CGFloat(i)*(.pi/2); let ia=an + .pi/4
             let outer=CGPoint(x:cos(an)*p.sz,y:sin(an)*p.sz)
             let inner=CGPoint(x:cos(ia)*p.sz*0.28,y:sin(ia)*p.sz*0.28)
             if i==0{path.move(to:outer)}else{path.addLine(to:outer)}
@@ -521,7 +521,7 @@ func tryInsertGratitude(){
     usleep(30_000)
     let src=CGEventSource(stateID:.combinedSessionState)
     let vDown=CGEvent(keyboardEventSource:src,virtualKey:0x09,keyDown:true)
-    vDown?.flags=.maskCommand; vDown?.post(tap:.cghidEventTap)
+    vDown?.flags = .maskCommand; vDown?.post(tap:.cghidEventTap)
     let vUp=CGEvent(keyboardEventSource:src,virtualKey:0x09,keyDown:false)
     vUp?.post(tap:.cghidEventTap)
 }
@@ -554,7 +554,7 @@ class App: NSObject, NSApplicationDelegate {
             w.close(); self?.startPaw(btn)
         }
         w.contentView=v; w.makeKeyAndOrderFront(nil)
-        NSApp.activate(ignoringAppActivities:true)
+        NSApp.activate(ignoringOtherApps:true)
         setupWin=w
     }
 
@@ -581,7 +581,7 @@ class App: NSObject, NSApplicationDelegate {
             Paw.i.tick()
             let p=Paw.i
             let pt=NSPoint(x:p.px,y:p.py)
-            let screen=NSScreen.screens.first(where:{NSMouseInRect(NSPoint(x:pt.x,y:$0.frame.maxY-pt.y),$0.frame,false)})?? NSScreen.main
+            let screen=NSScreen.screens.first(where:{NSMouseInRect(NSPoint(x:pt.x,y:$0.frame.maxY-pt.y),$0.frame,false)}) ?? NSScreen.main
             let sh=screen?.frame.maxY ?? NSScreen.main?.frame.height ?? 900
             let wx=p.px-sz/2, wy=sh-p.py-sz/2
             self?.overlayWin?.setFrameOrigin(NSPoint(x:wx,y:wy))
@@ -593,13 +593,13 @@ class App: NSObject, NSApplicationDelegate {
 
     func startMouseMonitor(){
         let mask:CGEventMask =
-            (1<<CGEventType.mouseMoved.rawValue)|
-            (1<<CGEventType.leftMouseDown.rawValue)|(1<<CGEventType.leftMouseUp.rawValue)|
-            (1<<CGEventType.rightMouseDown.rawValue)|(1<<CGEventType.rightMouseUp.rawValue)|
-            (1<<CGEventType.otherMouseDown.rawValue)|(1<<CGEventType.otherMouseUp.rawValue)|
-            (1<<CGEventType.leftMouseDragged.rawValue)|
-            (1<<CGEventType.rightMouseDragged.rawValue)|
-            (1<<CGEventType.otherMouseDragged.rawValue)
+            (1<<CGEventType.mouseMoved.rawValue)
+            | (1<<CGEventType.leftMouseDown.rawValue) | (1<<CGEventType.leftMouseUp.rawValue)
+            | (1<<CGEventType.rightMouseDown.rawValue) | (1<<CGEventType.rightMouseUp.rawValue)
+            | (1<<CGEventType.otherMouseDown.rawValue) | (1<<CGEventType.otherMouseUp.rawValue)
+            | (1<<CGEventType.leftMouseDragged.rawValue)
+            | (1<<CGEventType.rightMouseDragged.rawValue)
+            | (1<<CGEventType.otherMouseDragged.rawValue)
         guard let tap=CGEvent.tapCreate(tap:.cghidEventTap,place:.headInsertEventTap,
             options:.listenOnly,eventsOfInterest:mask,
             callback:mouseCallback,userInfo:nil) else{
@@ -608,7 +608,7 @@ class App: NSObject, NSApplicationDelegate {
             alert.informativeText="Lapka needs Accessibility permission to track mouse events.\n\nGo to System Settings → Privacy & Security → Accessibility and enable Lapka."
             alert.addButton(withTitle:"Open Settings")
             alert.addButton(withTitle:"Quit")
-            if alert.runModal()==.alertFirstButtonReturn{
+            if alert.runModal() == .alertFirstButtonReturn{
                 NSWorkspace.shared.open(URL(string:"x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!)}
             NSApp.terminate(nil); return
         }

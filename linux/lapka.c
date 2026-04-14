@@ -3,6 +3,7 @@
  * Stack: C11 + X11 + Cairo + ALSA (all MIT/LGPL, no license issues)
  * Build: gcc -O2 -o lapka lapka.c -lX11 -lcairo -lXfixes -lXext -lXi -lXtst -lasound -lpthread -lm
  */
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -152,11 +153,11 @@ static void*purr_fn(void*arg){
             if(w<0){snd_pcm_recover(pcm,w,0);continue;}off+=w;}}
     snd_pcm_drain(pcm);snd_pcm_close(pcm);return NULL;
 }
+static volatile int snd_running=0;
 static void play_purr(void){
     if(purring||!wav_pcm)return;purring=1;
     if(pthread_create(&snd_thread,NULL,purr_fn,NULL)!=0)purring=0;
     else snd_running=1;}
-static volatile int snd_running=0;
 static void stop_purr(void){
     if(!purring)return;purring=0;
     if(snd_running){pthread_join(snd_thread,NULL);snd_running=0;}}
