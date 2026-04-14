@@ -273,7 +273,7 @@ static void d_glow(cairo_t*cr,double x,double y){
 static void d_speed(cairo_t*cr,double x,double y,double vx,double vy,double sp){
     double a=atan2(vy,vx),in_=(sp-12)/30;if(in_>1)in_=1;
     cairo_save(cr);cairo_translate(cr,x,y);cairo_rotate(cr,a+PI);
-    cairo_set_source_rgba(cr,1,0.71,0.82,in_*0.25);
+    cairo_set_source_rgba(cr,1,180.0/255,210.0/255,in_*65.0/255);
     cairo_set_line_width(cr,1.5);cairo_set_line_cap(cr,CAIRO_LINE_CAP_ROUND);
     for(int i=0;i<5;i++){double s=(i-2)*8,l=15+in_*25;
         cairo_move_to(cr,30,s);cairo_line_to(cr,30+l,s);cairo_stroke(cr);}
@@ -281,14 +281,14 @@ static void d_speed(cairo_t*cr,double x,double y,double vx,double vy,double sp){
 }
 static void d_hold(cairo_t*cr,double x,double y){
     if(!isH)return;double pr=fmin(1,(t_now-hT)/HOLD_SEC),r=40;
-    cairo_set_source_rgba(cr,1,1,1,0.06);cairo_set_line_width(cr,3);
+    cairo_set_source_rgba(cr,1,1,1,15.0/255);cairo_set_line_width(cr,3);
     ellipse(cr,x,y,r,r);cairo_stroke(cr);
     double sw=pr*2*PI;if(sw>0){
         cairo_set_source_rgba(cr,1,0.59,0.71,0.3+pr*0.5);
         cairo_set_line_cap(cr,CAIRO_LINE_CAP_ROUND);
         cairo_arc(cr,x,y,r,-PI/2,-PI/2+sw);cairo_stroke(cr);}
     if(pr>0.8){cairo_set_source_rgba(cr,1,0.59,0.71,(pr-0.8)*5*0.6);
-        draw_centered(cr,"bye~",x,y+r+14,11,1);}
+        draw_centered(cr,"bye~",x,y+r+10,11,1);}
 }
 
 static void d_paw(cairo_t*cr,double x,double y,double sc,double ro,
@@ -299,16 +299,16 @@ static void d_paw(cairo_t*cr,double x,double y,double sc,double ro,
     cairo_translate(cr,0,pr*5/fmax(sc,0.01));
 
     if(pr>0.25&&al>0.78){double ia=(pr-0.25)/0.75*0.5,sp=t_now*3;
-        cairo_set_source_rgba(cr,1,0.55,0.71,ia*al);
+        cairo_set_source_rgba(cr,1,140.0/255,180.0/255,ia*al);
         cairo_set_line_width(cr,2.2);cairo_set_line_cap(cr,CAIRO_LINE_CAP_ROUND);
         for(int i=0;i<8;i++){double an=i*PI/4+sp;
             cairo_move_to(cr,cos(an)*34,sin(an)*34);
             cairo_line_to(cr,cos(an)*(44+pr*14),sin(an)*(44+pr*14));cairo_stroke(cr);}}
 
-    cairo_set_source_rgba(cr,0,0,0,al*0.1);
+    cairo_set_source_rgba(cr,0,0,0,al*25.0/255);
     ellipse(cr,0,9,(52+pr*6)/2.0,9);cairo_fill(cr);
 
-    if(al>0.78){cairo_set_source_rgba(cr,0.93,0.85,0.78,al*0.39);
+    if(al>0.78){cairo_set_source_rgba(cr,238.0/255,218.0/255,198.0/255,al*100.0/255);
         cairo_set_line_width(cr,0.7);
         for(int i=0;i<18;i++){double an=i/18.0*PI*2+0.12,l=((i*7)%4)*0.7+1.8;
             cairo_move_to(cr,cos(an)*24,sin(an)*28);
@@ -331,7 +331,7 @@ static void d_paw(cairo_t*cr,double x,double y,double sc,double ro,
     cairo_pattern_destroy(g);
     cairo_set_source_rgba(cr,OLR,OLG,OLB,al);cairo_set_line_width(cr,1.9);cairo_stroke(cr);}
 
-    cairo_set_source_rgba(cr,1,1,1,al*0.42);
+    cairo_set_source_rgba(cr,1,1,1,al*107.0/255);
     ellipse(cr,-3.5,-2,6,3.8);cairo_fill(cr);
     {double spk=(sin(t_now*2)*0.5+0.5)*0.35;
     cairo_set_source_rgba(cr,1,1,1,spk*al);
@@ -342,15 +342,15 @@ static void d_paw(cairo_t*cr,double x,double y,double sc,double ro,
     for(int i=0;i<4;i++){double tx=toes[i][0],ty=toes[i][1],rx=toes[i][2],
         ry=toes[i][3],ta=toes[i][4];double ws=(wk>0&&i==1)?(1-wk*0.8):1;
         cairo_save(cr);cairo_translate(cr,tx,ty);cairo_rotate(cr,ta);
-        cairo_set_source_rgba(cr,1,0.69,0.8,al);
+        cairo_set_source_rgba(cr,1,176.0/255,204.0/255,al);
         ellipse(cr,0,0,rx*ws,ry*ws);cairo_fill(cr);
         cairo_set_source_rgba(cr,OLR,OLG,OLB,al);cairo_set_line_width(cr,1.7);
         ellipse(cr,0,0,rx*ws,ry*ws);cairo_stroke(cr);
-        cairo_set_source_rgba(cr,1,1,1,al*0.42);
-        ellipse(cr,-rx*0.35*ws,-ry*0.4*ws,rx*0.35*ws,ry*0.2*ws);cairo_fill(cr);
+        cairo_set_source_rgba(cr,1,1,1,al*107.0/255);
+        ellipse(cr,0,-ry*0.2*ws,rx*0.35*ws,ry*0.2*ws);cairo_fill(cr);
         cairo_restore(cr);}
 
-    cairo_set_source_rgba(cr,1,0.39,0.55,al*0.14);
+    cairo_set_source_rgba(cr,1,100.0/255,140.0/255,al*36.0/255);
     ellipse(cr,-12,5,4.5,2.5);cairo_fill(cr);
     ellipse(cr,12,5,4.5,2.5);cairo_fill(cr);
     cairo_restore(cr);
@@ -475,9 +475,6 @@ static void try_gratitude(void){
     usleep(50000);
     while(XPending(dpy)){XEvent ev;XNextEvent(dpy,&ev);
         if(ev.type==SelectionRequest)handle_sel_req(&ev);}
-    KeyCode shift=XKeysymToKeycode(dpy,XK_Shift_L),ret=XKeysymToKeycode(dpy,XK_Return);
-    XTestFakeKeyEvent(dpy,shift,True,0);XTestFakeKeyEvent(dpy,ret,True,0);
-    XTestFakeKeyEvent(dpy,ret,False,0);XTestFakeKeyEvent(dpy,shift,False,0);XFlush(dpy);
 }
 
 /* ═══════════════════════════════════════════════════════════

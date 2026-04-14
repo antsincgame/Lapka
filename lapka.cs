@@ -253,11 +253,6 @@ class Lapka
             keybd_event(0x56,0,0,UIntPtr.Zero);
             keybd_event(0x56,0,2,UIntPtr.Zero);
             keybd_event(0x11,0,2,UIntPtr.Zero);
-            System.Threading.Thread.Sleep(50);
-            keybd_event(0x10,0,0,UIntPtr.Zero);
-            keybd_event(0x0D,0,0,UIntPtr.Zero);
-            keybd_event(0x0D,0,2,UIntPtr.Zero);
-            keybd_event(0x10,0,2,UIntPtr.Zero);
         }
         catch {}
     }

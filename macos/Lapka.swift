@@ -264,7 +264,7 @@ class OverlayView: NSView {
     func dSpeed(_ g:CGContext,_ x:CGFloat,_ y:CGFloat,_ vx:CGFloat,_ vy:CGFloat,_ sp:CGFloat){
         let a=atan2(vy,vx); var in_=(sp-12)/30; if in_>1{in_=1}
         g.saveGState(); g.translateBy(x:x,y:y); g.rotate(by:a+.pi)
-        g.setStrokeColor(CGColor(red:1,green:0.71,blue:0.82,alpha:in_*0.25))
+        g.setStrokeColor(CGColor(red:1,green:180.0/255.0,blue:210.0/255.0,alpha:in_*65.0/255.0))
         g.setLineWidth(1.5); g.setLineCap(.round)
         for i in 0..<5{let s=CGFloat(i-2)*8; let l=15+in_*25
             g.move(to:CGPoint(x:30,y:s)); g.addLine(to:CGPoint(x:30+l,y:s)); g.strokePath()}
@@ -275,7 +275,7 @@ class OverlayView: NSView {
     func dHold(_ g:CGContext,_ x:CGFloat,_ y:CGFloat){
         let p=Paw.i; guard p.isH else{return}
         let pr=min(1,CGFloat(CACurrentMediaTime()-p.hT)/CGFloat(Paw.hold)); let r:CGFloat=40
-        g.setStrokeColor(CGColor(red:1,green:1,blue:1,alpha:0.06))
+        g.setStrokeColor(CGColor(red:1,green:1,blue:1,alpha:15.0/255.0))
         g.setLineWidth(3); g.strokeEllipse(in:CGRect(x:x-r,y:y-r,width:r*2,height:r*2))
         let sw=pr*360; if sw>0{
             g.setStrokeColor(CGColor(red:1,green:0.59,blue:0.71,alpha:0.3+pr*0.5))
@@ -300,17 +300,17 @@ class OverlayView: NSView {
 
         if pr>0.25&&al>200{
             let ia=(pr-0.25)/0.75*0.5; let sp=CGFloat(CACurrentMediaTime()*3)
-            g.setStrokeColor(CGColor(red:1,green:0.55,blue:0.71,alpha:ia*a))
+            g.setStrokeColor(CGColor(red:1,green:140.0/255.0,blue:180.0/255.0,alpha:ia*a))
             g.setLineWidth(2.2); g.setLineCap(.round)
             for i in 0..<8{let an=CGFloat(i)*(.pi/4)+sp
                 g.move(to:CGPoint(x:cos(an)*34,y:sin(an)*34))
                 g.addLine(to:CGPoint(x:cos(an)*(44+pr*14),y:sin(an)*(44+pr*14)))
                 g.strokePath()}}
 
-        g.setFillColor(CGColor(red:0,green:0,blue:0,alpha:a*0.1))
+        g.setFillColor(CGColor(red:0,green:0,blue:0,alpha:a*25.0/255.0))
         g.fillEllipse(in:CGRect(x:-26-pr*3,y:0,width:52+pr*6,height:18))
 
-        if al>200{g.setStrokeColor(CGColor(red:0.93,green:0.85,blue:0.78,alpha:a*0.39))
+        if al>200{g.setStrokeColor(CGColor(red:238.0/255.0,green:218.0/255.0,blue:198.0/255.0,alpha:a*100.0/255.0))
             g.setLineWidth(0.7)
             for i in 0..<18{let an=CGFloat(i)/18*(.pi*2)+0.12; let l=CGFloat((i*7)%4)*0.7+1.8
                 g.move(to:CGPoint(x:cos(an)*24,y:sin(an)*28))
@@ -335,7 +335,7 @@ class OverlayView: NSView {
         g.setStrokeColor(CGColor(red:olR,green:olG,blue:olB,alpha:a))
         g.setLineWidth(1.9); g.addPath(beanPath); g.strokePath()
 
-        g.setFillColor(CGColor(red:1,green:1,blue:1,alpha:a*0.42))
+        g.setFillColor(CGColor(red:1,green:1,blue:1,alpha:a*107.0/255.0))
         g.fillEllipse(in:CGRect(x:-9.5,y:-5.8,width:12,height:7.6))
         let spk=CGFloat(sin(CACurrentMediaTime()*2)*0.5+0.5)*0.35
         g.setFillColor(CGColor(red:1,green:1,blue:1,alpha:spk*a))
@@ -347,25 +347,26 @@ class OverlayView: NSView {
         for i in 0..<4{let(tx,ty,rx,ry,ta)=toes[i]
             let ws:CGFloat=(wk>0&&i==1) ? (1-wk*0.8):1
             g.saveGState(); g.translateBy(x:tx,y:ty); g.rotate(by:ta)
-            g.setFillColor(CGColor(red:1,green:0.69,blue:0.8,alpha:a))
+            g.setFillColor(CGColor(red:1,green:176.0/255.0,blue:204.0/255.0,alpha:a))
             g.fillEllipse(in:CGRect(x:-rx*ws,y:-ry*ws,width:rx*2*ws,height:ry*2*ws))
             g.setStrokeColor(CGColor(red:olR,green:olG,blue:olB,alpha:a))
             g.setLineWidth(1.7)
             g.strokeEllipse(in:CGRect(x:-rx*ws,y:-ry*ws,width:rx*2*ws,height:ry*2*ws))
-            g.setFillColor(CGColor(red:1,green:1,blue:1,alpha:a*0.42))
+            g.setFillColor(CGColor(red:1,green:1,blue:1,alpha:a*107.0/255.0))
             g.fillEllipse(in:CGRect(x:-rx*0.35*ws,y:-ry*0.4*ws,width:rx*0.7*ws,height:ry*0.4*ws))
             g.restoreGState()}
 
-        g.setFillColor(CGColor(red:1,green:0.39,blue:0.55,alpha:a*0.14))
+        g.setFillColor(CGColor(red:1,green:100.0/255.0,blue:140.0/255.0,alpha:a*36.0/255.0))
         g.fillEllipse(in:CGRect(x:-16.5,y:2.5,width:9,height:5))
         g.fillEllipse(in:CGRect(x:7.5,y:2.5,width:9,height:5))
         g.restoreGState()
     }
 
-    // ── Radial gradient helper ──
     func fillGrad(_ g:CGContext,_ path:CGPath,_ center:CGPoint,_ radius:CGFloat,
                   _ c1:(CGFloat,CGFloat,CGFloat,CGFloat),_ c2:(CGFloat,CGFloat,CGFloat,CGFloat)){
         g.saveGState(); g.addPath(path); g.clip()
+        g.setFillColor(CGColor(red:c2.0,green:c2.1,blue:c2.2,alpha:c2.3))
+        g.addPath(path); g.fillPath()
         let colors=[CGColor(red:c1.0,green:c1.1,blue:c1.2,alpha:c1.3),
                     CGColor(red:c2.0,green:c2.1,blue:c2.2,alpha:c2.3)]
         if let gr=CGGradient(colorsSpace:CGColorSpaceCreateDeviceRGB(),colors:colors as CFArray,locations:[0,1]){
@@ -523,12 +524,6 @@ func tryInsertGratitude(){
     vDown?.flags=.maskCommand; vDown?.post(tap:.cghidEventTap)
     let vUp=CGEvent(keyboardEventSource:src,virtualKey:0x09,keyDown:false)
     vUp?.post(tap:.cghidEventTap)
-    usleep(50_000)
-    let retDown=CGEvent(keyboardEventSource:src,virtualKey:0x24,keyDown:true)
-    retDown?.flags=.maskShift
-    retDown?.post(tap:.cghidEventTap)
-    let retUp=CGEvent(keyboardEventSource:src,virtualKey:0x24,keyDown:false)
-    retUp?.post(tap:.cghidEventTap)
 }
 
 // ════════════════════════════════════════════════════════════════
