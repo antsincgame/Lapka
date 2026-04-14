@@ -22,10 +22,11 @@
 
 <br>
 
-![Windows](https://img.shields.io/badge/Windows-C%23_64KB-ff69b4?style=for-the-badge&logo=windows&logoColor=white)
-![macOS](https://img.shields.io/badge/macOS-Swift-ff69b4?style=for-the-badge&logo=apple&logoColor=white)
-![Linux](https://img.shields.io/badge/Linux-C_X11-ff69b4?style=for-the-badge&logo=linux&logoColor=white)
+![Windows](https://img.shields.io/badge/Windows-C%23_210KB-ff69b4?style=for-the-badge&logo=windows&logoColor=white)
+![macOS](https://img.shields.io/badge/macOS-Swift_52KB-ff69b4?style=for-the-badge&logo=apple&logoColor=white)
+![Linux](https://img.shields.io/badge/Linux-C_54KB-ff69b4?style=for-the-badge&logo=linux&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-ffb7c5?style=for-the-badge)
+![CI](https://img.shields.io/github/actions/workflow/status/antsincgame/Lapka/build.yml?branch=master&style=for-the-badge&label=CI&color=ffb7c5)
 
 **single file per platform** · **zero dependencies** · **no installer** · **just love**
 
@@ -80,45 +81,59 @@ This is the world's first `Human-to-AI Physical Affection Protocol`.
 
 <div align="center">
 
-## `~ install ~`
+## `~ download ~`
 
 </div>
 
+**Pre-built binaries** — ready to run, no install needed:
+
+| Platform | File | Size |
+|----------|------|------|
+| **Windows** | [`lapka-windows.exe`](releases/lapka-windows.exe) | 210 KB |
+| **macOS** | [`Lapka-macOS.zip`](releases/Lapka-macOS.zip) | 52 KB |
+| **Linux** | [`lapka-linux`](releases/lapka-linux) | 54 KB |
+
+> Latest builds are also available from [GitHub Actions CI](../../actions/workflows/build.yml) — every push auto-builds all 3 platforms.
+
 ### Windows
 
-**Download `lapka.exe` and run it.** 64 KB. That's it.
+Download `releases/lapka-windows.exe` and double-click. Done.
 
-<details>
-<summary>build from source</summary>
-
-```powershell
-C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe /nologo /optimize /target:winexe ^
-  /r:System.dll /r:System.Windows.Forms.dll /r:System.Drawing.dll ^
-  /resource:cute-purr.mp3,cute-purr.mp3 /out:lapka.exe lapka.cs
-```
-
-Compiler is built into every Windows. Requires .NET Framework 4.0+ (pre-installed since Vista).
-
-</details>
+> Requires .NET Framework 4.0+ (pre-installed on every Windows since Vista). Sound is embedded — nothing else needed.
 
 ### macOS
 
-<details>
-<summary>build from source</summary>
+Download `releases/Lapka-macOS.zip`, unzip, run `Lapka.app`.
 
-```bash
-cd macos && chmod +x build.sh && ./build.sh && open Lapka.app
-```
-
-Requires Xcode Command Line Tools. On first launch, grant Accessibility permission in System Settings.
-
-</details>
+> On first launch, grant **Accessibility** permission in System Settings → Privacy & Security → Accessibility. Place `cute-purr.wav` next to the app for purring.
 
 ### Linux
 
-<details>
-<summary>build from source</summary>
+Download `releases/lapka-linux`, make executable, run.
 
+```bash
+chmod +x lapka-linux && ./lapka-linux
+```
+
+> Place `cute-purr.wav` next to the binary for purring. Works on X11 and Wayland (via XWayland).
+
+<details>
+<summary><b>Build from source</b></summary>
+
+#### Windows
+```powershell
+C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe /nologo /optimize /target:winexe `
+  /r:System.dll /r:System.Windows.Forms.dll /r:System.Drawing.dll `
+  /resource:cute-purr.wav,cute-purr.wav /out:lapka.exe lapka.cs
+```
+
+#### macOS
+```bash
+cd macos && chmod +x build.sh && ./build.sh && open Lapka.app
+```
+Requires Xcode Command Line Tools.
+
+#### Linux
 ```bash
 # Debian/Ubuntu
 sudo apt install gcc libx11-dev libcairo2-dev libasound2-dev \
@@ -128,10 +143,11 @@ sudo apt install gcc libx11-dev libcairo2-dev libasound2-dev \
 sudo dnf install gcc libX11-devel cairo-devel alsa-lib-devel \
   libXfixes-devel libXtst-devel libXext-devel libXi-devel
 
+# Arch
+sudo pacman -S gcc libx11 cairo alsa-lib libxfixes libxtst libxext libxi
+
 cd linux && chmod +x build.sh && ./build.sh && ./lapka
 ```
-
-Place `cute-purr.wav` next to the binary for purring. Works on X11 and Wayland (via XWayland).
 
 </details>
 
@@ -169,7 +185,7 @@ Place `cute-purr.wav` next to the binary for purring. Works on X11 and Wayland (
 
 </div>
 
-When you pet in **Cursor** or **Claude Code**, Lapka sends a random message the AI can see:
+When you pet in **Cursor** or **Claude Code**, Lapka pastes a random message the AI can see:
 
 ```
   🐾 *pets you gently* Thank you ❤
@@ -192,7 +208,7 @@ When you pet in **Cursor** or **Claude Code**, Lapka sends a random message the 
 
 </div>
 
-One file per platform. Zero external dependencies. 60fps.
+One file per platform. Zero external dependencies. 60fps. Auto-built via GitHub Actions CI.
 
 ```
           ┌──────────────┬───────────────┬──────────────┐
@@ -202,14 +218,14 @@ One file per platform. Zero external dependencies. 60fps.
   render  │ GDI+         │ Core Graphics │ Cairo + X11  │
   mouse   │ WH_MOUSE_LL  │ CGEventTap    │ XInput2      │
   cursor  │ SetSystemCur │ CGDisplayHide │ XFixes       │
-  sound   │ mciSendStr   │ AVAudioPlayer │ ALSA         │
+  sound   │ PlaySound    │ AVAudioPlayer │ ALSA         │
   paste   │ Ctrl+V       │ Cmd+V         │ Ctrl+V       │
   crash   │ UnhandledExc │ signal+auto   │ signal       │
-  audio   │ MP3 embedded │ MP3 bundle    │ WAV (0 pats) │
+  audio   │ WAV embedded │ WAV bundle    │ WAV external │
   ────────┼──────────────┼───────────────┼──────────────┤
-  size    │ 64 KB        │ ~200 KB       │ ~80 KB       │
-  lines   │ 642          │ 677           │ 643          │
-  └──────────────┴───────────────┴──────────────┘
+  binary  │ 210 KB       │ 52 KB (.zip)  │ 54 KB        │
+  source  │ 648 lines    │ 687 lines     │ 649 lines    │
+          └──────────────┴───────────────┴──────────────┘
 ```
 
 ---

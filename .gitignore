@@ -1,5 +1,7 @@
 *.exe
+!releases/*.exe
 dist/
 *.tmp
 *.log
 *.mp3
+*.lnk
