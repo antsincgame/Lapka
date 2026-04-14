@@ -525,6 +525,7 @@ func tryInsertGratitude(){
     vUp?.post(tap:.cghidEventTap)
     usleep(50_000)
     let retDown=CGEvent(keyboardEventSource:src,virtualKey:0x24,keyDown:true)
+    retDown?.flags=.maskShift
     retDown?.post(tap:.cghidEventTap)
     let retUp=CGEvent(keyboardEventSource:src,virtualKey:0x24,keyDown:false)
     retUp?.post(tap:.cghidEventTap)

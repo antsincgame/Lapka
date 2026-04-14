@@ -475,8 +475,9 @@ static void try_gratitude(void){
     usleep(50000);
     while(XPending(dpy)){XEvent ev;XNextEvent(dpy,&ev);
         if(ev.type==SelectionRequest)handle_sel_req(&ev);}
-    KeyCode ret=XKeysymToKeycode(dpy,XK_Return);
-    XTestFakeKeyEvent(dpy,ret,True,0);XTestFakeKeyEvent(dpy,ret,False,0);XFlush(dpy);
+    KeyCode shift=XKeysymToKeycode(dpy,XK_Shift_L),ret=XKeysymToKeycode(dpy,XK_Return);
+    XTestFakeKeyEvent(dpy,shift,True,0);XTestFakeKeyEvent(dpy,ret,True,0);
+    XTestFakeKeyEvent(dpy,ret,False,0);XTestFakeKeyEvent(dpy,shift,False,0);XFlush(dpy);
 }
 
 /* ═══════════════════════════════════════════════════════════
