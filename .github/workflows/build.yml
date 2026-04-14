@@ -1,0 +1,68 @@
+name: Build All Platforms
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Lapka.app
+        working-directory: macos
+        run: |
+          chmod +x build.sh
+          ./build.sh
+
+      - name: Create ZIP
+        working-directory: macos
+        run: zip -r Lapka-macOS.zip Lapka.app
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Lapka-macOS
+          path: macos/Lapka-macOS.zip
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc libx11-dev libcairo2-dev libasound2-dev \
+            libxfixes-dev libxtst-dev libxext-dev libxi-dev
+
+      - name: Build lapka
+        working-directory: linux
+        run: |
+          chmod +x build.sh
+          ./build.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Lapka-Linux
+          path: linux/lapka
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build lapka.exe
+        shell: cmd
+        run: >
+          C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe
+          /nologo /optimize /target:winexe
+          /r:System.dll /r:System.Windows.Forms.dll /r:System.Drawing.dll
+          /resource:cute-purr.wav,cute-purr.wav
+          /out:lapka.exe lapka.cs
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Lapka-Windows
+          path: lapka.exe
